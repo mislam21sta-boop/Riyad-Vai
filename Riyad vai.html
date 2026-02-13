@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Valentine 💖</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#131b3f;
+      --card:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.10);
+      --text:#f4f6ff;
+      --muted:rgba(244,246,255,.72);
+      --accent:#ff4e9b;
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --radius:22px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(255,78,155,.18), transparent 55%),
+        radial-gradient(900px 600px at 100% 10%, rgba(255,107,107,.14), transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:28px 14px 60px;
+    }
+
+    .card{
+      width:min(560px, 95vw);
+      background: var(--card);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    header{ text-align:center; padding:10px 6px 14px; }
+    h1{
+      margin:0;
+      font-size: clamp(22px, 4.5vw, 30px);
+      text-shadow: 0 0 16px rgba(255,78,155,.35);
+      animation: glow 2.2s ease-in-out infinite alternate;
+    }
+    @keyframes glow{
+      from{ text-shadow:0 0 10px rgba(255,78,155,.35); }
+      to{ text-shadow:0 0 22px rgba(255,78,155,.75); }
+    }
+    .subtitle{
+      margin:10px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    /* Slideshow */
+    .slideshow{
+      width:100%;
+      aspect-ratio: 3 / 4;          /* portrait-friendly */
+      border-radius: calc(var(--radius) - 4px);
+      overflow:hidden;
+      position:relative;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.10);
+      margin: 14px auto 10px;
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transition: opacity 900ms ease;
+    }
+    .slide.active{ opacity:1; }
+
+    .slide img{
+      width:100%;
+      height:100%;
+      object-fit: contain;           /* পুরো ছবি দেখাবে, কাটবে না */
+      display:block;
+      background: rgba(0,0,0,.20);
+    }
+
+    .dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      padding:12px 0 6px;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background: rgba(255,255,255,.25);
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .dot.active{
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(255,78,155,.6);
+    }
+
+    .audio{ margin-top:6px; }
+    audio{ width:100%; }
+
+    .controls{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      padding: 12px 0 6px;
+      position:relative;
+      min-height:56px;
+    }
+
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      padding:12px 18px;
+      border-radius:999px;
+      font-size:16px;
+      font-weight:700;
+      transition: transform .15s ease, filter .15s ease;
+      user-select:none;
+    }
+    button:active{ transform: scale(.98); }
+
+    .btn-primary{
+      color:white;
+      background: linear-gradient(45deg, var(--accent), #ffb86b);
+    }
+    .btn-primary:hover{ transform: translateY(-1px); }
+
+    .btn-ghost{
+      background: rgba(255,255,255,.12);
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .btn-ghost:hover{ transform: translateY(-1px); }
+
+    /* No button moves but stays inside controls area */
+    #noBtn{
+      position:absolute;
+      right: 12px;
+      bottom: 8px;
+      white-space:nowrap;
+    }
+
+    /* Hearts */
+    .heart{
+      position:fixed;
+      top:-14px;
+      color:var(--accent);
+      animation: fall 5s linear forwards;
+      z-index: 1;
+      pointer-events:none;
+      filter: drop-shadow(0 6px 10px rgba(255,78,155,.25));
+    }
+    @keyframes fall{
+      0%{ transform:translateY(0); opacity:1;}
+      100%{ transform:translateY(105vh); opacity:0;}
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,.55);
+      padding:18px;
+      z-index: 50;
+    }
+    .modal.open{ display:grid; }
+
+    .modal-card{
+      width:min(440px, 92vw);
+      background: rgba(16, 24, 54, .95);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px 16px;
+      position:relative;
+      animation: pop .18s ease-out;
+    }
+    @keyframes pop{
+      from{ transform: translateY(8px) scale(.98); opacity:.6; }
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+
+    .modal-card h2{ margin: 6px 6px 10px; font-size: 20px; }
+    .modal-card p{ margin: 0 6px 14px; color: var(--muted); line-height:1.6; font-size: 15px; }
+
+    .close{
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:36px;height:36px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      font-weight:900;
+      display:grid;
+      place-items:center;
+    }
+
+    canvas#fx{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index: 60;
+    }
+
+    footer{
+      text-align:center;
+      margin-top: 10px;
+      color: rgba(244,246,255,.55);
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <main class="wrap">
+    <section class="card" aria-label="Valentine card">
+      <header>
+        <h1>🌙 Happy Valentine Day💖</h1>
+        <p class="subtitle">A little memory lane + a tiny love letter 💌</p>
+      </header>
+
+      <div class="slideshow" aria-label="Photo slideshow">
+                <div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.00.23 PM.jpeg" alt="Memory 2"></div>
+        <div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.00.24 PM.jpeg" alt="Memory 3"></div>
+        <div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.00.25 PM.jpeg" alt="Memory 4"></div>
+        <div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.00.242 PM.jpeg" alt="Memory 5"></div>
+        <div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.02.59 PM.jpeg" alt="Memory 6"></div>
+<div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.03.0000 PM.jpeg" alt="Memory 7"></div>
+<div class="slide"><img src="C:\Users\user\OneDrive\Desktop\RIYAD VAI/WhatsApp Image 2026-02-13 at 9.03.00 PM.jpeg" alt="Memory 8"></div>
+
+      </div>
+
+      <div class="dots" id="dots" aria-hidden="true"></div>
+
+      <div class="audio">
+        <audio controls autoplay loop preload="auto">
+          <source src="C:\Users\user\OneDrive\Desktop\New folder/Teri aankhon ki namkeen mastiyan _ jabtakhaijaan poem shahrukhkhan yashchopra shorts romantic.mp3" type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+
+      <div class="controls" id="controls">
+        <button class="btn-primary" id="openBtn" type="button">Open My Heart 💌</button>
+        <button class="btn-ghost" id="noBtn" type="button">No 😅</button>
+      </div>
+
+      <footer>Tip: Press <b>ESC</b> to close the letter.</footer>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+    <div class="modal-card">
+      <button class="close" id="closeBtn" type="button" aria-label="Close">✕</button>
+      <h2 id="letterTitle">💌 My Love Letter</h2>
+      <p>
+        From the day you came into my life, everything became more beautiful.
+        You are my happiness, my peace, my forever Valentine💖
+তুমি ভুলে যেওনা আমাকে, আমি ভালবাসি তোমাকে🖤
+      </p>
+      <button class="btn-primary" id="loveBtn" type="button">Love You ❤️</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Slideshow ---
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dotsWrap = document.getElementById("dots");
+    let index = 0;
+
+    const dots = slides.map((_, i) => {
+      const d = document.createElement("span");
+      d.className = "dot" + (i === 0 ? " active" : "");
+      dotsWrap.appendChild(d);
+      return d;
+    });
+
+    function goTo(next){
+      slides[index].classList.remove("active");
+      dots[index].classList.remove("active");
+      index = (next + slides.length) % slides.length;
+      slides[index].classList.add("active");
+      dots[index].classList.add("active");
+    }
+    setInterval(() => goTo(index + 1), 2500);
+
+    // --- Floating hearts ---
+    setInterval(() => {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = "💖";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.fontSize = (18 + Math.random() * 22) + "px";
+      heart.style.opacity = (0.65 + Math.random() * 0.35).toFixed(2);
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 5200);
+    }, 320);
+
+    // --- Modal open/close ---
+    const modal = document.getElementById("modal");
+    const openBtn = document.getElementById("openBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const loveBtn = document.getElementById("loveBtn");
+
+    function openModal(){
+      modal.classList.add("open");
+      closeBtn.focus();
+    }
+    function closeModal(){
+      modal.classList.remove("open");
+      openBtn.focus();
+    }
+    openBtn.addEventListener("click", openModal);
+    closeBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
+    window.addEventListener("keydown", (e) => { if(e.key === "Escape" && modal.classList.contains("open")) closeModal(); });
+
+    // --- “No” button run (bounded) ---
+    const noBtn = document.getElementById("noBtn");
+    const controls = document.getElementById("controls");
+
+    function moveNoButton(){
+      const box = controls.getBoundingClientRect();
+      const btn = noBtn.getBoundingClientRect();
+      const padding = 6;
+
+      const maxX = box.width - btn.width - padding;
+      const maxY = box.height - btn.height - padding;
+
+      const x = padding + Math.random() * Math.max(0, maxX - padding);
+      const y = padding + Math.random() * Math.max(0, maxY - padding);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("touchstart", moveNoButton, { passive:true });
+
+    // --- Simple sparkle burst ---
+    const canvas = document.getElementById("fx");
+    const ctx = canvas.getContext("2d");
+    function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+    resize(); addEventListener("resize", resize);
+
+    function sparkleBurst(){
+      const count = 180;
+      const cx = canvas.width * (0.2 + Math.random() * 0.6);
+      const cy = canvas.height * (0.2 + Math.random() * 0.5);
+
+      const particles = Array.from({length: count}, () => ({
+        x: cx, y: cy,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.6) * 8,
+        r: 1.2 + Math.random() * 2.6,
+        a: 1,
+      }));
+
+      let t = 0;
+      function frame(){
+        t++;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        particles.forEach(p => {
+          p.vy += 0.08;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.a *= 0.985;
+
+          ctx.globalAlpha = Math.max(0, p.a);
+          ctx.fillStyle = "pink";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.globalAlpha = 1;
+        if (t < 120) requestAnimationFrame(frame);
+        else ctx.clearRect(0,0,canvas.width,canvas.height);
+      }
+      requestAnimationFrame(frame);
+    }
+    loveBtn.addEventListener("click", sparkleBurst);
+  </script>
+</body>
+</html>
